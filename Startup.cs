@@ -28,10 +28,12 @@ namespace AuthDemo
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+            // DB Context
             services.AddDbContext<DBContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("DBContext")));
 
+            //Configure Identity Service
             services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<DBContext>();
-
             services.Configure<IdentityOptions>(options =>
             {
                 options.Password.RequireDigit = false;
@@ -39,6 +41,7 @@ namespace AuthDemo
                 options.Password.RequireUppercase = false;
             });
 
+            // JWT Configuration
             var jwtSettings = Configuration.GetSection("JwtSettings");
             services.AddAuthentication(opt =>
             {
@@ -96,8 +99,11 @@ namespace AuthDemo
             app.UseSpaStaticFiles();
 
             app.UseRouting();
+
+            // Required for Authentication.
             app.UseAuthentication();
             app.UseAuthorization();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
