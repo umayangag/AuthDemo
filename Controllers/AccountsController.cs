@@ -19,7 +19,7 @@ namespace AuthDemo.Controllers
     public class AccountsController : ControllerBase
     {
         private readonly IMapper _mapper;
-        private readonly UserManager<User> _userManager;       
+        private readonly UserManager<User> _userManager;
         private readonly IConfigurationSection _jwtSettings;
 
         public AccountsController(IMapper mapper, UserManager<User> userManager, IConfiguration configuration)
@@ -29,7 +29,7 @@ namespace AuthDemo.Controllers
             _jwtSettings = configuration.GetSection("JwtSettings");
         }
 
-        [Authorize(Roles ="Visitor")]
+        [Authorize(Roles = "Visitor")]
         [HttpGet("Test")]
         public String Test()
         {
@@ -47,7 +47,7 @@ namespace AuthDemo.Controllers
             }
             await _userManager.AddToRoleAsync(user, "Visitor");
 
-            return Ok(user);
+            return StatusCode(201);
         }
 
         [HttpPost("Login")]
@@ -63,8 +63,8 @@ namespace AuthDemo.Controllers
                 var token = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
                 return Ok(token);
             }
-            return Unauthorized("Invalid Authentication");       
-                           
+            return Unauthorized("Invalid Authentication");
+
         }
 
         private SigningCredentials GetSigningCredentials()
@@ -74,7 +74,7 @@ namespace AuthDemo.Controllers
 
             return new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
         }
-        
+
         private JwtSecurityToken GenerateTokenOptions(SigningCredentials signingCredentials, List<Claim> claims)
         {
             var tokenOptions = new JwtSecurityToken(
@@ -90,9 +90,9 @@ namespace AuthDemo.Controllers
         private async Task<List<Claim>> GetClaims(User user)
         {
             var claims = new List<Claim>
-    {
-        new Claim(ClaimTypes.Name, user.Email)
-    };
+            {
+                new Claim(ClaimTypes.Name, user.Email)
+            };
             var roles = await _userManager.GetRolesAsync(user);
             foreach (var role in roles)
             {
